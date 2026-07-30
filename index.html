@@ -2,108 +2,149 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>團隊用餐登記</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fdfaf4;
+      margin: 0;
+      padding: 20px;
+      font-family:
+        "Microsoft JhengHei",
+        "PingFang TC",
+        sans-serif;
       color: #4a3728;
-      margin: 20px;
+      background: #fdfaf4;
     }
 
     .container {
       display: flex;
-      gap: 20px;
-      max-width: 1000px;
+      gap: 22px;
+      width: 100%;
+      max-width: 1100px;
       margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
     }
 
     .left-panel {
       flex: 2;
+      min-width: 0;
     }
 
     .right-panel {
       flex: 1;
-      background-color: #fffdf9;
-      border: 1px solid #f0e6df;
-      border-radius: 8px;
-      padding: 15px;
+      min-width: 290px;
+      padding: 18px;
+      background: #fffdf9;
+      border: 1px solid #f0e1d6;
+      border-radius: 10px;
     }
 
     .header-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 22px;
       color: #d35400;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .name-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .name-area label {
+      font-weight: bold;
     }
 
     select {
-      padding: 8px;
+      min-width: 180px;
+      padding: 9px 12px;
       font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 100%;
-      max-width: 200px;
-      margin-bottom: 20px;
+      border: 1px solid #cfc5bc;
+      border-radius: 7px;
+      background: #ffffff;
     }
 
     .calendar-header {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
-      font-size: 22px;
-      font-weight: bold;
+      gap: 25px;
       margin-bottom: 15px;
     }
 
+    #calendarTitle {
+      min-width: 190px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
     .nav-btn {
-      background: none;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 5px 10px;
+      width: 44px;
+      height: 38px;
       cursor: pointer;
-      font-size: 16px;
+      background: #ffffff;
+      border: 1px solid #cfc5bc;
+      border-radius: 7px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .nav-btn:hover {
+      color: #ffffff;
+      background: #e65100;
+      border-color: #e65100;
     }
 
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
       text-align: center;
-      gap: 8px;
     }
 
     .weekday {
+      padding: 11px 0;
       font-weight: bold;
-      padding: 10px 0;
-      border-bottom: 2px solid #f0e6df;
+      border-bottom: 2px solid #f0e1d6;
     }
 
     .day {
-      padding: 12px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 58px;
       cursor: pointer;
       border-radius: 50%;
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
+      font-size: 17px;
+      transition: 0.15s;
     }
 
     .day:hover {
-      background-color: #f5f5f5;
+      color: #d35400;
+      background: #fff1e7;
     }
 
     .day.selected {
-      background-color: #e65100;
-      color: white;
+      color: #ffffff;
+      background: #e65100;
       font-weight: bold;
+      box-shadow: 0 4px 10px rgba(230, 81, 0, 0.25);
     }
 
     .day.empty {
@@ -111,20 +152,21 @@
     }
 
     .day.empty:hover {
-      background: none;
+      background: transparent;
     }
 
     .detail-title {
-      font-size: 18px;
+      margin-bottom: 14px;
+      padding-bottom: 9px;
+      border-bottom: 1px dashed #d6c8be;
+      font-size: 20px;
       font-weight: bold;
-      border-bottom: 1px dashed #ccc;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
     }
 
     .info-text {
-      margin: 8px 0;
-      color: #7f8c8d;
+      margin: 10px 0;
+      color: #706159;
+      line-height: 1.6;
     }
 
     .info-text span {
@@ -133,44 +175,60 @@
     }
 
     .date-list {
-      min-height: 100px;
-      max-height: 150px;
+      min-height: 120px;
+      max-height: 210px;
+      margin: 10px 0 18px;
+      padding: 7px;
       overflow-y: auto;
-      border: 1px solid #f0e6df;
-      padding: 5px;
-      border-radius: 4px;
-      font-size: 14px;
-      margin-bottom: 15px;
-      background: #fff;
+      background: #ffffff;
+      border: 1px solid #eadbd0;
+      border-radius: 7px;
     }
 
     .date-item {
-      padding: 4px 5px;
-      border-bottom: 1px solid #eee;
+      padding: 8px 7px;
+      border-bottom: 1px solid #f1e8e1;
+    }
+
+    .date-item:last-child {
+      border-bottom: none;
+    }
+
+    .empty-message {
+      padding: 12px 6px;
+      color: #a4958b;
+      text-align: center;
+    }
+
+    .calculation {
+      margin-bottom: 10px;
+      color: #657746;
+      text-align: right;
+      font-weight: bold;
     }
 
     .price-box {
-      font-size: 20px;
-      font-weight: bold;
-      text-align: right;
+      margin-bottom: 18px;
       color: #d35400;
-      margin-bottom: 15px;
+      text-align: right;
+      font-size: 22px;
+      font-weight: bold;
     }
 
     .submit-btn {
       width: 100%;
-      background-color: #e65100;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 6px;
+      padding: 14px;
       cursor: pointer;
+      color: #ffffff;
+      background: #e65100;
+      border: none;
+      border-radius: 7px;
+      font-size: 19px;
+      font-weight: bold;
     }
 
     .submit-btn:hover {
-      background-color: #bf360c;
+      background: #bf360c;
     }
 
     .modal-overlay {
@@ -178,56 +236,110 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
       justify-content: center;
       align-items: center;
-      z-index: 100;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.55);
     }
 
     .modal {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      width: 300px;
+      width: 100%;
+      max-width: 370px;
+      padding: 26px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal h3 {
+      margin-top: 0;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      font-size: 22px;
+    }
+
+    .modal-content {
+      line-height: 1.9;
+    }
+
+    .important {
+      color: #d35400;
+      font-weight: bold;
     }
 
     .modal-btns {
       display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      gap: 10px;
+      gap: 12px;
+      margin-top: 22px;
     }
 
     .modal-btn {
       flex: 1;
-      padding: 10px;
-      border-radius: 4px;
-      border: none;
+      padding: 11px;
       cursor: pointer;
+      border-radius: 6px;
       font-size: 16px;
+      font-weight: bold;
     }
 
     .btn-cancel {
-      background: #eee;
-      color: #333;
+      color: #333333;
+      background: #eeeeee;
+      border: 1px solid #dddddd;
     }
 
     .btn-confirm {
+      color: #ffffff;
       background: #e65100;
-      color: white;
+      border: 1px solid #e65100;
     }
 
-    @media (max-width: 700px) {
+    .modal-btn:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    @media (max-width: 760px) {
       body {
-        margin: 10px;
+        padding: 10px;
       }
 
       .container {
         flex-direction: column;
+        padding: 16px;
+      }
+
+      .right-panel {
+        min-width: 0;
+      }
+
+      .name-area {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      select {
+        width: 100%;
+      }
+
+      #calendarTitle {
+        min-width: 145px;
+        font-size: 20px;
+      }
+
+      .calendar-header {
+        gap: 10px;
+      }
+
+      .day {
+        min-height: 43px;
+        font-size: 15px;
+      }
+
+      .weekday {
+        font-size: 14px;
       }
     }
   </style>
@@ -237,31 +349,62 @@
 
   <div class="container">
 
-    <div class="left-panel">
-      <div class="header-title">團隊用餐登記 🍱</div>
+    <section class="left-panel">
 
-      <label for="nameSelect">選擇姓名：</label>
-
-      <select id="nameSelect">
-        <option value="陳志明">陳志明</option>
-        <option value="林小美">林小美</option>
-        <option value="王大同">王大同</option>
-      </select>
-
-      <div class="calendar-header">
-        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <span id="calendarTitle"></span>
-        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+      <div class="header-title">
+        團隊用餐登記 🍱
       </div>
 
-      <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
+      <div class="name-area">
+        <label for="nameSelect">
+          選擇姓名：
+        </label>
 
-    <div class="right-panel">
-      <div class="detail-title">📝 登記明細</div>
+        <select id="nameSelect">
+          <option value="陳志明">陳志明</option>
+          <option value="林小美">林小美</option>
+          <option value="王大同">王大同</option>
+        </select>
+      </div>
+
+      <div class="calendar-header">
+        <button
+          type="button"
+          class="nav-btn"
+          onclick="changeMonth(-1)"
+          aria-label="上個月"
+        >
+          ◀
+        </button>
+
+        <span id="calendarTitle"></span>
+
+        <button
+          type="button"
+          class="nav-btn"
+          onclick="changeMonth(1)"
+          aria-label="下個月"
+        >
+          ▶
+        </button>
+      </div>
+
+      <div
+        class="calendar-grid"
+        id="calendarGrid"
+      ></div>
+
+    </section>
+
+    <aside class="right-panel">
+
+      <div class="detail-title">
+        📝 登記明細
+      </div>
 
       <div class="info-text">
-        餐點由餐飲公司統一供應，每份餐點
+        餐點由餐飲公司統一供應，
+        每份餐點
         <span>NT$ 100</span>
       </div>
 
@@ -270,92 +413,144 @@
         <span id="displayName">陳志明</span>
       </div>
 
-      <div class="info-text">已選擇用餐日期：</div>
+      <div class="info-text">
+        已選擇用餐日期：
+      </div>
 
-      <div class="date-list" id="selectedDateList"></div>
+      <div
+        class="date-list"
+        id="selectedDateList"
+      ></div>
+
+      <div
+        class="calculation"
+        id="calculationText"
+      >
+        0 天 × NT$ 100
+      </div>
 
       <div class="price-box">
         總金額：
         <span id="totalAmount">NT$ 0</span>
       </div>
 
-      <button class="submit-btn" onclick="openModal()">
+      <button
+        type="button"
+        class="submit-btn"
+        onclick="openModal()"
+      >
         確認登記
       </button>
-    </div>
+
+    </aside>
 
   </div>
 
-  <div class="modal-overlay" id="confirmModal">
+  <div
+    class="modal-overlay"
+    id="confirmModal"
+  >
+
     <div class="modal">
 
       <h3>🔍 請再次確認</h3>
 
-      <p style="text-align:left; line-height:1.8;">
+      <div class="modal-content">
         登記人員：
-        <span id="modalName"></span>
+        <span id="modalName" class="important"></span>
         <br>
 
         用餐天數：
-        <span id="modalDays"
-              style="color:#d35400; font-weight:bold;"></span>
+        <span id="modalDays" class="important"></span>
         天
         <br>
 
+        日期明細：
+        <span id="modalDates" class="important"></span>
+        <br>
+
         總金額：
-        <span id="modalAmount"
-              style="color:#d35400; font-weight:bold;"></span>
-      </p>
+        <span id="modalAmount" class="important"></span>
+      </div>
 
       <div class="modal-btns">
-        <button class="modal-btn btn-cancel"
-                onclick="closeModal()">
+
+        <button
+          type="button"
+          class="modal-btn btn-cancel"
+          onclick="closeModal()"
+        >
           返回修改
         </button>
 
-        <button class="modal-btn btn-confirm"
-                onclick="submitData()">
+        <button
+          type="button"
+          class="modal-btn btn-confirm"
+          id="confirmSendButton"
+          onclick="submitData()"
+        >
           確認送出
         </button>
+
       </div>
 
     </div>
+
   </div>
 
   <script>
     /*
-      將下面網址換成你的 Google Apps Script 網頁應用程式網址。
-      尚未設定網址時，月曆及金額計算仍然可以正常使用。
+      Google Apps Script 網頁應用程式網址
     */
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/execL";
-
-    const now = new Date();
-
-    let currentYear = now.getFullYear();
-    let currentMonth = now.getMonth() + 1;
+    const scriptURL =
+      "https://script.google.com/macros/s/AKfycbwk2Tw9ppRdfCwByJMp4mcOlrL0NPmtMPPhPYiuxtuq_Mg1Djx8zdFGQas5Clm3Lt7I/exec";
 
     const pricePerMeal = 100;
 
+    /*
+      預設顯示目前月份。
+    */
+    const today = new Date();
+
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth() + 1;
+
+    /*
+      每次只登記一個月份。
+    */
     let selectedDates = [];
 
-    document.addEventListener("DOMContentLoaded", function () {
-      initCalendar();
-      updateDetails();
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        initCalendar();
+        updateDetails();
 
-      document
-        .getElementById("nameSelect")
-        .addEventListener("change", function (event) {
-          document.getElementById("displayName").innerText =
-            event.target.value;
-        });
-    });
+        document
+          .getElementById("nameSelect")
+          .addEventListener(
+            "change",
+            function (event) {
+              document.getElementById(
+                "displayName"
+              ).innerText = event.target.value;
+            }
+          );
+      }
+    );
 
     function initCalendar() {
-      const grid = document.getElementById("calendarGrid");
-      const title = document.getElementById("calendarTitle");
+      const grid =
+        document.getElementById("calendarGrid");
+
+      const title =
+        document.getElementById("calendarTitle");
 
       title.innerText =
-        currentYear + " 年 " + currentMonth + " 月";
+        currentYear +
+        " 年 " +
+        currentMonth +
+        " 月";
 
       grid.innerHTML = `
         <div class="weekday">日</div>
@@ -368,50 +563,108 @@
       `;
 
       const firstDayIndex =
-        new Date(currentYear, currentMonth - 1, 1).getDay();
+        new Date(
+          currentYear,
+          currentMonth - 1,
+          1
+        ).getDay();
 
       const totalDays =
-        new Date(currentYear, currentMonth, 0).getDate();
+        new Date(
+          currentYear,
+          currentMonth,
+          0
+        ).getDate();
 
-      for (let i = 0; i < firstDayIndex; i++) {
-        const emptyDiv = document.createElement("div");
+      for (
+        let i = 0;
+        i < firstDayIndex;
+        i++
+      ) {
+        const emptyDiv =
+          document.createElement("div");
+
         emptyDiv.className = "day empty";
+
         grid.appendChild(emptyDiv);
       }
 
-      for (let day = 1; day <= totalDays; day++) {
-        const dayDiv = document.createElement("div");
+      for (
+        let day = 1;
+        day <= totalDays;
+        day++
+      ) {
+        const dayDiv =
+          document.createElement("div");
 
         dayDiv.className = "day";
         dayDiv.innerText = day;
 
         const dateStr =
-          currentYear + "/" + currentMonth + "/" + day;
+          currentYear +
+          "/" +
+          currentMonth +
+          "/" +
+          day;
 
-        if (selectedDates.includes(dateStr)) {
+        if (
+          selectedDates.includes(dateStr)
+        ) {
           dayDiv.classList.add("selected");
         }
 
-        dayDiv.onclick = function () {
-          if (selectedDates.includes(dateStr)) {
-            selectedDates = selectedDates.filter(function (date) {
-              return date !== dateStr;
-            });
+        dayDiv.addEventListener(
+          "click",
+          function () {
+            if (
+              selectedDates.includes(dateStr)
+            ) {
+              selectedDates =
+                selectedDates.filter(
+                  function (date) {
+                    return date !== dateStr;
+                  }
+                );
 
-            dayDiv.classList.remove("selected");
-          } else {
-            selectedDates.push(dateStr);
-            dayDiv.classList.add("selected");
+              dayDiv.classList.remove(
+                "selected"
+              );
+            } else {
+              selectedDates.push(dateStr);
+
+              dayDiv.classList.add(
+                "selected"
+              );
+            }
+
+            updateDetails();
           }
-
-          updateDetails();
-        };
+        );
 
         grid.appendChild(dayDiv);
       }
     }
 
     function changeMonth(direction) {
+      /*
+        更換月份時清除上一個月份的選擇，
+        避免資料寫入錯誤的工作表。
+      */
+      if (
+        selectedDates.length > 0
+      ) {
+        const confirmChange =
+          confirm(
+            "切換月份會清除目前已選日期，確定要繼續嗎？"
+          );
+
+        if (!confirmChange) {
+          return;
+        }
+      }
+
+      selectedDates = [];
+
       currentMonth += direction;
 
       if (currentMonth > 12) {
@@ -425,188 +678,344 @@
       }
 
       initCalendar();
+      updateDetails();
     }
 
     function updateDetails() {
       const listContainer =
-        document.getElementById("selectedDateList");
+        document.getElementById(
+          "selectedDateList"
+        );
 
       const amountSpan =
-        document.getElementById("totalAmount");
+        document.getElementById(
+          "totalAmount"
+        );
+
+      const calculationText =
+        document.getElementById(
+          "calculationText"
+        );
 
       listContainer.innerHTML = "";
 
-      selectedDates.sort(function (a, b) {
-        return new Date(a) - new Date(b);
-      });
+      selectedDates.sort(
+        function (a, b) {
+          return (
+            parseDate(a) -
+            parseDate(b)
+          );
+        }
+      );
 
-      if (selectedDates.length === 0) {
-        listContainer.innerHTML =
-          '<div class="date-item">尚未選擇日期</div>';
+      if (
+        selectedDates.length === 0
+      ) {
+        const emptyMessage =
+          document.createElement("div");
+
+        emptyMessage.className =
+          "empty-message";
+
+        emptyMessage.innerText =
+          "尚未選擇用餐日期";
+
+        listContainer.appendChild(
+          emptyMessage
+        );
       }
 
-      selectedDates.forEach(function (dateStr) {
-        const date = new Date(dateStr);
+      selectedDates.forEach(
+        function (dateStr) {
+          const date = parseDate(dateStr);
 
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
+          const month =
+            date.getMonth() + 1;
 
-        const weekday =
-          ["日", "一", "二", "三", "四", "五", "六"]
-          [date.getDay()];
+          const day =
+            date.getDate();
 
-        const item = document.createElement("div");
+          const weekday =
+            [
+              "日",
+              "一",
+              "二",
+              "三",
+              "四",
+              "五",
+              "六"
+            ][date.getDay()];
 
-        item.className = "date-item";
+          const item =
+            document.createElement("div");
 
-        item.innerText =
-          "📅 " + month + "/" + day + "（" + weekday + "）";
+          item.className = "date-item";
 
-        listContainer.appendChild(item);
-      });
+          item.innerText =
+            "📅 " +
+            month +
+            "/" +
+            day +
+            "（" +
+            weekday +
+            "）";
+
+          listContainer.appendChild(item);
+        }
+      );
 
       const totalCost =
-        selectedDates.length * pricePerMeal;
+        selectedDates.length *
+        pricePerMeal;
 
-      amountSpan.innerText = "NT$ " + totalCost;
+      calculationText.innerText =
+        selectedDates.length +
+        " 天 × NT$ " +
+        pricePerMeal;
+
+      amountSpan.innerText =
+        "NT$ " + totalCost;
+    }
+
+    function parseDate(dateStr) {
+      const parts = dateStr.split("/");
+
+      return new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2]),
+        12,
+        0,
+        0
+      );
+    }
+
+    function makeDateDetails() {
+      return selectedDates
+        .map(
+          function (dateStr) {
+            const date =
+              parseDate(dateStr);
+
+            const month =
+              date.getMonth() + 1;
+
+            const day =
+              date.getDate();
+
+            const weekday =
+              [
+                "日",
+                "一",
+                "二",
+                "三",
+                "四",
+                "五",
+                "六"
+              ][date.getDay()];
+
+            return (
+              month +
+              "/" +
+              day +
+              "（" +
+              weekday +
+              "）"
+            );
+          }
+        )
+        .join("、");
     }
 
     function openModal() {
-      if (selectedDates.length === 0) {
-        alert("請至少選擇一天用餐日期！");
+      if (
+        selectedDates.length === 0
+      ) {
+        alert(
+          "請至少選擇一天用餐日期！"
+        );
+
         return;
       }
 
       const name =
-        document.getElementById("nameSelect").value;
+        document.getElementById(
+          "nameSelect"
+        ).value;
 
-      document.getElementById("modalName").innerText =
-        name;
+      const totalAmount =
+        selectedDates.length *
+        pricePerMeal;
 
-      document.getElementById("modalDays").innerText =
+      const dateDetailsString =
+        makeDateDetails();
+
+      document.getElementById(
+        "modalName"
+      ).innerText = name;
+
+      document.getElementById(
+        "modalDays"
+      ).innerText =
         selectedDates.length;
 
-      document.getElementById("modalAmount").innerText =
-        "NT$ " + selectedDates.length * pricePerMeal;
+      document.getElementById(
+        "modalDates"
+      ).innerText =
+        dateDetailsString;
 
-      document.getElementById("confirmModal").style.display =
-        "flex";
+      document.getElementById(
+        "modalAmount"
+      ).innerText =
+        "NT$ " + totalAmount;
+
+      document.getElementById(
+        "confirmModal"
+      ).style.display = "flex";
     }
 
     function closeModal() {
-      document.getElementById("confirmModal").style.display =
-        "none";
+      document.getElementById(
+        "confirmModal"
+      ).style.display = "none";
     }
 
     function submitData() {
       const name =
-        document.getElementById("nameSelect").value;
+        document.getElementById(
+          "nameSelect"
+        ).value;
 
-      const totalDays = selectedDates.length;
-      const totalAmount = totalDays * pricePerMeal;
+      const totalDays =
+        selectedDates.length;
+
+      const totalAmount =
+        totalDays *
+        pricePerMeal;
 
       const dateDetailsString =
-        selectedDates.map(function (dateStr) {
-          const date = new Date(dateStr);
-
-          const month = date.getMonth() + 1;
-          const day = date.getDate();
-
-          const weekday =
-            ["日", "一", "二", "三", "四", "五", "六"]
-            [date.getDay()];
-
-          return (
-            month + "/" + day + "（" + weekday + "）"
-          );
-        }).join("、");
-
-      if (
-        !scriptURL ||
-        scriptURL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"
-      ) {
-        alert(
-          "頁面功能正常，但尚未連接 Google Sheet。\n\n" +
-          "登記人員：" + name + "\n" +
-          "用餐日期：" + dateDetailsString + "\n\n" +
-          "請先把 scriptURL 換成 Apps Script 網址。"
-        );
-
-        closeModal();
-        return;
-      }
-
-      const formData = new URLSearchParams();
+        makeDateDetails();
 
       /*
-        Google Sheet：
-        A欄＝姓名
-        B欄＝用餐日期
+        工作表名稱格式：
+        2026/08、2026/09、2026/10
       */
-      formData.append(
-  "sheetName",
-  currentYear + "/" + String(currentMonth).padStart(2, "0")
-  );
+      const sheetName =
+        currentYear +
+        "/" +
+        String(
+          currentMonth
+        ).padStart(2, "0");
 
-formData.append("name", name);
-formData.append("totalDays", totalDays);
-formData.append("totalAmount", totalAmount);
-formData.append("dates", dateDetailsString);
+      const formData =
+        new URLSearchParams();
+
+      formData.append(
+        "sheetName",
+        sheetName
+      );
+
+      formData.append(
+        "name",
+        name
+      );
+
+      formData.append(
+        "totalDays",
+        totalDays
+      );
+
+      formData.append(
+        "totalAmount",
+        totalAmount
+      );
+
+      formData.append(
+        "dates",
+        dateDetailsString
+      );
 
       const submitButton =
-        document.querySelector(".btn-confirm");
+        document.getElementById(
+          "confirmSendButton"
+        );
 
       submitButton.disabled = true;
-      submitButton.innerText = "送出中…";
+      submitButton.innerText =
+        "送出中…";
 
-      fetch(scriptURL, {
-  method: "POST",
-  mode: "no-cors",
-  body: formData
-})
-.then(function () {
-  alert(
-    "資料已送出！\n\n" +
-    "登記人員：" + name + "\n" +
-    "用餐日期：" + dateDetailsString + "\n" +
-    "總金額：NT$ " + totalAmount
-  );
+      /*
+        使用 no-cors 避免 GitHub Pages
+        被 Apps Script 跨網域限制阻擋。
+      */
+      fetch(
+        scriptURL,
+        {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        }
+      )
+      .then(
+        function () {
+          alert(
+            "資料已送出！\n\n" +
+            "登記人員：" +
+            name +
+            "\n" +
+            "用餐日期：" +
+            dateDetailsString +
+            "\n" +
+            "總金額：NT$ " +
+            totalAmount
+          );
 
-  selectedDates = [];
-  initCalendar();
-  updateDetails();
-  closeModal();
-})
-.catch(function (error) {
-  console.error("送出失敗：", error);
+          selectedDates = [];
 
-  alert(
-    "送出失敗，請檢查網路或 Apps Script 網址。"
-  );
-})
-.finally(function () {
-  submitButton.disabled = false;
-  submitButton.innerText = "確認送出";
-});
+          initCalendar();
+          updateDetails();
+          closeModal();
+        }
+      )
+      .catch(
+        function (error) {
+          console.error(
+            "送出失敗：",
+            error
+          );
 
-        selectedDates = [];
-
-        initCalendar();
-        updateDetails();
-        closeModal();
-      })
-      .catch(function (error) {
-        console.error("送出失敗：", error);
-
-        alert(
-          "送出失敗，請檢查 Apps Script 網址及部署權限。"
-        );
-      })
-      .finally(function () {
-        submitButton.disabled = false;
-        submitButton.innerText = "確認送出";
-      });
+          alert(
+            "送出失敗，請檢查網路或 Apps Script 網址。"
+          );
+        }
+      )
+      .finally(
+        function () {
+          submitButton.disabled = false;
+          submitButton.innerText =
+            "確認送出";
+        }
+      );
     }
+
+    /*
+      點擊黑色背景時關閉確認視窗。
+    */
+    document
+      .getElementById(
+        "confirmModal"
+      )
+      .addEventListener(
+        "click",
+        function (event) {
+          if (
+            event.target.id ===
+            "confirmModal"
+          ) {
+            closeModal();
+          }
+        }
+      );
   </script>
 
 </body>
