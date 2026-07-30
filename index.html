@@ -565,7 +565,12 @@ formData.append("dates", dateDetailsString);
   body: formData
 })
 .then(function () {
-  alert("登記成功！");
+  alert(
+    "資料已送出！\n\n" +
+    "登記人員：" + name + "\n" +
+    "用餐日期：" + dateDetailsString + "\n" +
+    "總金額：NT$ " + totalAmount
+  );
 
   selectedDates = [];
   initCalendar();
@@ -573,8 +578,15 @@ formData.append("dates", dateDetailsString);
   closeModal();
 })
 .catch(function (error) {
-  console.error(error);
-  alert("送出失敗，請檢查 Apps Script 網址。");
+  console.error("送出失敗：", error);
+
+  alert(
+    "送出失敗，請檢查網路或 Apps Script 網址。"
+  );
+})
+.finally(function () {
+  submitButton.disabled = false;
+  submitButton.innerText = "確認送出";
 });
 
         selectedDates = [];
