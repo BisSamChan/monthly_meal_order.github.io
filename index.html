@@ -10,7 +10,7 @@
 
   <title>用餐登記</title>
 
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=TPTbwkOtGfvUqZ4DkTad2Kl2lTinWNsPnZVZlxmpShGsi-cAIuymWiD2sMLuachXBQMxD5qvNXWK0MSK6yg2XLoTb67F0o3O37fSQIvyK2d_LpdmWpjdXvQbJDZgarkcZ3Z90QnbWPDwhx6RF0EkSYIQaSdJ7qiDqT-bIP_fFjdhhss3nnb3n-pymIBCOMbrZINoTcJ4iSkLUj69CDZd54Q8SQd9ZoKVCALIXDTVgLvLTyB_2oIZehksho2VWw0qDkvXCY2EZGLhyJdnCBGETWCNOZhhCq21SulEIj_emrFZCLZKyXFcx04ZPWRfe03j" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9jaGF0Z3B0LmNvbS9iYWNrZW5kLWFwaS9lc3R1YXJ5L2NvbnRlbnQ_aWQ9ZmlsZV8wMDAwMDAwMDVjYjQ4MWY1YmFiYjM0OWQ4NTVhY2Q2ZSZmbj1pbmRleCUyODMlMjkuaHRtbCZjZD1hdHRhY2htZW50JnRzPTQ5NTk0OSZwPWZzJmNpZD0xJnNpZz0zNTliZDY1MTAyODAzNGEyYTZlNzAyNTdmN2NmMjkwZjkyZDNjYWI5YjQzOThlNGQxYTA1NzQ0NjIwYzQ2ZGI3JnY9MA"/><style>
     * {
       box-sizing: border-box;
     }
@@ -461,9 +461,9 @@
           <option value="陳弘康">陳弘康</option>
           <option value="簡郁宬">簡郁宬</option>
           <option value="蔡政廷">蔡政廷</option>
-          <option value="慮又華">慮又華</option>
+          <option value="盧又華">盧又華</option>
           <option value="陳豐文">陳豐文</option>
-
+          
         </select>
       </div>
 
@@ -502,7 +502,7 @@
 
         <div class="legend-item">
           <span class="legend-dot legend-off"></span>
-          休假日（不可選）
+          休假日／週末（不可選）
         </div>
 
         <div class="legend-item">
@@ -620,7 +620,7 @@
       Google Apps Script 網頁應用程式網址
     */
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbzp45Gf3ua-X5XOB1pk2iar2bnON0QRjc-wzZrG16hWrb4uqgP8X-QuPu9IDEqVcTYp/exec";
+      "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/exec";
 
     const pricePerMeal = 100;
 
@@ -840,15 +840,35 @@
           );
 
         /*
-          休假日只顯示，不加入點擊功能。
+          星期六與星期日不供餐。
         */
-        if (!dutyDay) {
+        const dayOfWeek =
+          new Date(
+            currentYear,
+            currentMonth - 1,
+            day
+          ).getDay();
+
+        const weekend =
+          dayOfWeek === 0 ||
+          dayOfWeek === 6;
+
+        /*
+          休假日或週末只顯示，
+          不加入午餐、晚餐按鈕。
+        */
+        if (
+          !dutyDay ||
+          weekend
+        ) {
           dayDiv.classList.add(
             "off-day"
           );
 
           dayDiv.title =
-            "休假日，不開放用餐登記";
+            weekend
+              ? "週末不供餐"
+              : "休假日，不開放用餐登記";
 
           grid.appendChild(dayDiv);
           continue;
