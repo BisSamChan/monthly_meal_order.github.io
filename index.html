@@ -543,8 +543,15 @@
         A欄＝姓名
         B欄＝用餐日期
       */
-      formData.append("name", name);
-      formData.append("dates", dateDetailsString);
+      formData.append(
+  "sheetName",
+  currentYear + "/" + String(currentMonth).padStart(2, "0")
+);
+
+formData.append("name", name);
+formData.append("totalDays", totalDays);
+formData.append("totalAmount", totalAmount);
+formData.append("dates", dateDetailsString);
 
       const submitButton =
         document.querySelector(".btn-confirm");
@@ -553,23 +560,22 @@
       submitButton.innerText = "送出中…";
 
       fetch(scriptURL, {
-        method: "POST",
-        body: formData
-      })
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
+  method: "POST",
+  mode: "no-cors",
+  body: formData
+})
+.then(function () {
+  alert("登記成功！");
 
-        return response.text();
-      })
-      .then(function () {
-        alert(
-          "登記成功！\n\n" +
-          "登記人員：" + name + "\n" +
-          "用餐日期：" + dateDetailsString + "\n" +
-          "總金額：NT$ " + totalAmount
-        );
+  selectedDates = [];
+  initCalendar();
+  updateDetails();
+  closeModal();
+})
+.catch(function (error) {
+  console.error(error);
+  alert("送出失敗，請檢查 Apps Script 網址。");
+});
 
         selectedDates = [];
 
