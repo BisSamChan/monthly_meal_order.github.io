@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>團隊用餐登記</title>
+  <title>乙班訂餐登記</title>
 
   <style>
     * {
@@ -153,6 +153,54 @@
 
     .day.empty:hover {
       background: transparent;
+    }
+
+    .day.off-day {
+      color: #b5aaa3;
+      background: #f1efed;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .day.off-day:hover {
+      color: #b5aaa3;
+      background: #f1efed;
+    }
+
+    .calendar-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 22px;
+      margin-top: 16px;
+      color: #706159;
+      font-size: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+
+    .legend-duty {
+      background: #ffffff;
+      border: 1px solid #d6c8be;
+    }
+
+    .legend-off {
+      background: #f1efed;
+      border: 1px solid #d6c8be;
+    }
+
+    .legend-selected {
+      background: #e65100;
     }
 
     .detail-title {
@@ -341,6 +389,11 @@
       .weekday {
         font-size: 14px;
       }
+
+      .calendar-legend {
+        gap: 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -380,7 +433,6 @@
           <option value="許育維">許育維</option>
           <option value="黃敘桓">黃敘桓</option>
           <option value="童揚">童揚</option>
-
         </select>
       </div>
 
@@ -410,6 +462,25 @@
         class="calendar-grid"
         id="calendarGrid"
       ></div>
+
+      <div class="calendar-legend">
+
+        <div class="legend-item">
+          <span class="legend-dot legend-duty"></span>
+          值勤日（可選）
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-dot legend-off"></span>
+          休假日（不可選）
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-dot legend-selected"></span>
+          已選日期
+        </div>
+
+      </div>
 
     </section>
 
@@ -474,20 +545,32 @@
 
       <div class="modal-content">
         登記人員：
-        <span id="modalName" class="important"></span>
+        <span
+          id="modalName"
+          class="important"
+        ></span>
         <br>
 
         用餐天數：
-        <span id="modalDays" class="important"></span>
+        <span
+          id="modalDays"
+          class="important"
+        ></span>
         天
         <br>
 
         日期明細：
-        <span id="modalDates" class="important"></span>
+        <span
+          id="modalDates"
+          class="important"
+        ></span>
         <br>
 
         總金額：
-        <span id="modalAmount" class="important"></span>
+        <span
+          id="modalAmount"
+          class="important"
+        ></span>
       </div>
 
       <div class="modal-btns">
@@ -516,26 +599,58 @@
   </div>
 
   <script>
-    /*
-      Google Apps Script 網頁應用程式網址
-    */
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/exec";
 
     const pricePerMeal = 200;
 
-    /*
-      預設顯示目前月份。
-    */
     const today = new Date();
 
-    let currentYear = today.getFullYear();
-    let currentMonth = today.getMonth() + 1;
+    let currentYear =
+      today.getFullYear();
+
+    let currentMonth =
+      today.getMonth() + 1;
 
     /*
-      每次只登記一個月份。
+      班表基準：
+      2026/08/01 是值勤日。
     */
+    const dutyBaseDate =
+      Date.UTC(2026, 7, 1);
+
     let selectedDates = [];
+
+    /*
+      判斷指定日期是否為值勤日。
+    */
+    function isDutyDay(
+      year,
+      month,
+      day
+    ) {
+      const targetDate =
+        Date.UTC(
+          year,
+          month - 1,
+          day
+        );
+
+      const differenceDays =
+        Math.round(
+          (
+            targetDate -
+            dutyBaseDate
+          ) /
+          86400000
+        );
+
+      return (
+        Math.abs(differenceDays) %
+        2 ===
+        0
+      );
+    }
 
     document.addEventListener(
       "DOMContentLoaded",
@@ -550,7 +665,8 @@
             function (event) {
               document.getElementById(
                 "displayName"
-              ).innerText = event.target.value;
+              ).innerText =
+                event.target.value;
             }
           );
       }
@@ -558,10 +674,14 @@
 
     function initCalendar() {
       const grid =
-        document.getElementById("calendarGrid");
+        document.getElementById(
+          "calendarGrid"
+        );
 
       const title =
-        document.getElementById("calendarTitle");
+        document.getElementById(
+          "calendarTitle"
+        );
 
       title.innerText =
         currentYear +
@@ -601,7 +721,8 @@
         const emptyDiv =
           document.createElement("div");
 
-        emptyDiv.className = "day empty";
+        emptyDiv.className =
+          "day empty";
 
         grid.appendChild(emptyDiv);
       }
@@ -624,22 +745,52 @@
           "/" +
           day;
 
+        const dutyDay =
+          isDutyDay(
+            currentYear,
+            currentMonth,
+            day
+          );
+
+        /*
+          休假日只顯示，
+          不設定點擊事件。
+        */
+        if (!dutyDay) {
+          dayDiv.classList.add(
+            "off-day"
+          );
+
+          dayDiv.title =
+            "休假日，不開放用餐登記";
+
+          grid.appendChild(dayDiv);
+
+          continue;
+        }
+
         if (
           selectedDates.includes(dateStr)
         ) {
-          dayDiv.classList.add("selected");
+          dayDiv.classList.add(
+            "selected"
+          );
         }
 
         dayDiv.addEventListener(
           "click",
           function () {
             if (
-              selectedDates.includes(dateStr)
+              selectedDates.includes(
+                dateStr
+              )
             ) {
               selectedDates =
                 selectedDates.filter(
                   function (date) {
-                    return date !== dateStr;
+                    return (
+                      date !== dateStr
+                    );
                   }
                 );
 
@@ -647,7 +798,9 @@
                 "selected"
               );
             } else {
-              selectedDates.push(dateStr);
+              selectedDates.push(
+                dateStr
+              );
 
               dayDiv.classList.add(
                 "selected"
@@ -663,10 +816,6 @@
     }
 
     function changeMonth(direction) {
-      /*
-        更換月份時清除上一個月份的選擇，
-        避免資料寫入錯誤的工作表。
-      */
       if (
         selectedDates.length > 0
       ) {
@@ -681,7 +830,6 @@
       }
 
       selectedDates = [];
-
       currentMonth += direction;
 
       if (currentMonth > 12) {
@@ -744,7 +892,8 @@
 
       selectedDates.forEach(
         function (dateStr) {
-          const date = parseDate(dateStr);
+          const date =
+            parseDate(dateStr);
 
           const month =
             date.getMonth() + 1;
@@ -766,7 +915,8 @@
           const item =
             document.createElement("div");
 
-          item.className = "date-item";
+          item.className =
+            "date-item";
 
           item.innerText =
             "📅 " +
@@ -777,7 +927,9 @@
             weekday +
             "）";
 
-          listContainer.appendChild(item);
+          listContainer.appendChild(
+            item
+          );
         }
       );
 
@@ -795,7 +947,8 @@
     }
 
     function parseDate(dateStr) {
-      const parts = dateStr.split("/");
+      const parts =
+        dateStr.split("/");
 
       return new Date(
         Number(parts[0]),
@@ -913,10 +1066,6 @@
       const dateDetailsString =
         makeDateDetails();
 
-      /*
-        工作表名稱格式：
-        2026/08、2026/09、2026/10
-      */
       const sheetName =
         currentYear +
         "/" +
@@ -958,13 +1107,10 @@
         );
 
       submitButton.disabled = true;
+
       submitButton.innerText =
         "送出中…";
 
-      /*
-        使用 no-cors 避免 GitHub Pages
-        被 Apps Script 跨網域限制阻擋。
-      */
       fetch(
         scriptURL,
         {
@@ -1009,15 +1155,13 @@
       .finally(
         function () {
           submitButton.disabled = false;
+
           submitButton.innerText =
             "確認送出";
         }
       );
     }
 
-    /*
-      點擊黑色背景時關閉確認視窗。
-    */
     document
       .getElementById(
         "confirmModal"
