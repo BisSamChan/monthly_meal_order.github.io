@@ -327,7 +327,7 @@
       將下面網址換成你的 Google Apps Script 網頁應用程式網址。
       尚未設定網址時，月曆及金額計算仍然可以正常使用。
     */
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/execL";
 
     const now = new Date();
 
@@ -543,15 +543,8 @@
         A欄＝姓名
         B欄＝用餐日期
       */
-      formData.append(
-  "sheetName",
-  currentYear + "/" + String(currentMonth).padStart(2, "0")
-);
-
-formData.append("name", name);
-formData.append("totalDays", totalDays);
-formData.append("totalAmount", totalAmount);
-formData.append("dates", dateDetailsString);
+      formData.append("name", name);
+      formData.append("dates", dateDetailsString);
 
       const submitButton =
         document.querySelector(".btn-confirm");
@@ -560,22 +553,23 @@ formData.append("dates", dateDetailsString);
       submitButton.innerText = "送出中…";
 
       fetch(scriptURL, {
-  method: "POST",
-  mode: "no-cors",
-  body: formData
-})
-.then(function () {
-  alert("登記成功！");
+        method: "POST",
+        body: formData
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
 
-  selectedDates = [];
-  initCalendar();
-  updateDetails();
-  closeModal();
-})
-.catch(function (error) {
-  console.error(error);
-  alert("送出失敗，請檢查 Apps Script 網址。");
-});
+        return response.text();
+      })
+      .then(function () {
+        alert(
+          "登記成功！\n\n" +
+          "登記人員：" + name + "\n" +
+          "用餐日期：" + dateDetailsString + "\n" +
+          "總金額：NT$ " + totalAmount
+        );
 
         selectedDates = [];
 
