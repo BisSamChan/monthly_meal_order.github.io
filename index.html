@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>乙班訂餐登記</title>
+  <title>團隊用餐登記</title>
 
   <style>
     * {
@@ -126,25 +126,51 @@
 
     .day {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 58px;
-      cursor: pointer;
-      border-radius: 50%;
+      gap: 7px;
+      min-height: 88px;
+      padding: 7px 4px;
+      border-radius: 10px;
       font-size: 17px;
       transition: 0.15s;
     }
 
-    .day:hover {
-      color: #d35400;
-      background: #fff1e7;
+    .day-number {
+      font-weight: bold;
     }
 
-    .day.selected {
+    .meal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .meal-btn {
+      min-width: 31px;
+      padding: 5px 7px;
+      cursor: pointer;
+      color: #735d51;
+      background: #fff7ef;
+      border: 1px solid #dfc9ba;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .meal-btn:hover {
+      color: #d35400;
+      background: #fff0e4;
+      border-color: #e8a77c;
+    }
+
+    .meal-btn.selected {
       color: #ffffff;
       background: #e65100;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(230, 81, 0, 0.25);
+      border-color: #e65100;
+      box-shadow: 0 3px 8px rgba(230, 81, 0, 0.24);
     }
 
     .day.empty {
@@ -155,6 +181,9 @@
       background: transparent;
     }
 
+    /*
+      休假日：灰色顯示，而且不能點選。
+    */
     .day.off-day {
       color: #b5aaa3;
       background: #f1efed;
@@ -170,7 +199,6 @@
     .calendar-legend {
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 22px;
       margin-top: 16px;
       color: #706159;
@@ -389,11 +417,6 @@
       .weekday {
         font-size: 14px;
       }
-
-      .calendar-legend {
-        gap: 12px;
-        font-size: 12px;
-      }
     }
   </style>
 </head>
@@ -405,7 +428,7 @@
     <section class="left-panel">
 
       <div class="header-title">
-        乙班訂餐登記 🍱
+        團隊用餐登記 🍱
       </div>
 
       <div class="name-area">
@@ -414,7 +437,7 @@
         </label>
 
         <select id="nameSelect">
-          <option value="吳議元">吳議元</option>
+          <option value="吳議員">吳議員</option>
           <option value="林俊廷">林俊廷</option>
           <option value="廖哲瑤">廖哲瑤</option>
           <option value="翁祥峰">翁祥峰</option>
@@ -433,6 +456,7 @@
           <option value="許育維">許育維</option>
           <option value="黃敘桓">黃敘桓</option>
           <option value="童揚">童揚</option>
+
         </select>
       </div>
 
@@ -464,10 +488,9 @@
       ></div>
 
       <div class="calendar-legend">
-
         <div class="legend-item">
           <span class="legend-dot legend-duty"></span>
-          值勤日（可選）
+          值勤日（可選午／晚）
         </div>
 
         <div class="legend-item">
@@ -479,7 +502,6 @@
           <span class="legend-dot legend-selected"></span>
           已選日期
         </div>
-
       </div>
 
     </section>
@@ -492,8 +514,8 @@
 
       <div class="info-text">
         餐點由餐飲公司統一供應，
-        午餐及晚餐共
-        <span>NT$ 200</span>
+        每餐
+        <span>NT$ 100</span>
       </div>
 
       <div class="info-text">
@@ -514,7 +536,7 @@
         class="calculation"
         id="calculationText"
       >
-        0 天 × NT$ 200
+        0 餐 × NT$ 100
       </div>
 
       <div class="price-box">
@@ -545,32 +567,20 @@
 
       <div class="modal-content">
         登記人員：
-        <span
-          id="modalName"
-          class="important"
-        ></span>
+        <span id="modalName" class="important"></span>
         <br>
 
-        用餐天數：
-        <span
-          id="modalDays"
-          class="important"
-        ></span>
-        天
+        總餐數：
+        <span id="modalDays" class="important"></span>
+        餐
         <br>
 
         日期明細：
-        <span
-          id="modalDates"
-          class="important"
-        ></span>
+        <span id="modalDates" class="important"></span>
         <br>
 
         總金額：
-        <span
-          id="modalAmount"
-          class="important"
-        ></span>
+        <span id="modalAmount" class="important"></span>
       </div>
 
       <div class="modal-btns">
@@ -599,30 +609,90 @@
   </div>
 
   <script>
+    /*
+      Google Apps Script 網頁應用程式網址
+    */
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbzf63Fus5EfFM198K6PnPNFpIhXng-Z0vdEVTtI-6nK4Aa4A2nfaZb_OxxFXAuCSmbk/exec";
 
-    const pricePerMeal = 200;
+    const pricePerMeal = 100;
 
+    /*
+      預設顯示目前月份。
+    */
     const today = new Date();
 
-    let currentYear =
-      today.getFullYear();
-
-    let currentMonth =
-      today.getMonth() + 1;
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth() + 1;
 
     /*
       班表基準：
       2026/08/01 是值勤日。
+      之後依照「值勤一天、休假一天」持續輪替。
     */
     const dutyBaseDate =
       Date.UTC(2026, 7, 1);
 
-    let selectedDates = [];
+    /*
+      每次只登記一個月份。
+      資料格式：
+      {
+        "2026/8/1": {
+          lunch: true,
+          dinner: false
+        }
+      }
+    */
+    let selectedMeals = {};
+
+    function getTotalMeals() {
+      let total = 0;
+
+      Object.values(
+        selectedMeals
+      ).forEach(
+        function (meals) {
+          if (meals.lunch) {
+            total++;
+          }
+
+          if (meals.dinner) {
+            total++;
+          }
+        }
+      );
+
+      return total;
+    }
+
+    function toggleMeal(
+      dateStr,
+      mealType
+    ) {
+      if (!selectedMeals[dateStr]) {
+        selectedMeals[dateStr] = {
+          lunch: false,
+          dinner: false
+        };
+      }
+
+      selectedMeals[dateStr][mealType] =
+        !selectedMeals[dateStr][mealType];
+
+      if (
+        !selectedMeals[dateStr].lunch &&
+        !selectedMeals[dateStr].dinner
+      ) {
+        delete selectedMeals[dateStr];
+      }
+
+      initCalendar();
+      updateDetails();
+    }
 
     /*
-      判斷指定日期是否為值勤日。
+      判斷指定日期是不是值勤日。
+      使用 UTC 計算，避免時間或時區造成日期誤差。
     */
     function isDutyDay(
       year,
@@ -642,11 +712,18 @@
             targetDate -
             dutyBaseDate
           ) /
-          86400000
+          (
+            1000 *
+            60 *
+            60 *
+            24
+          )
         );
 
       return (
-        Math.abs(differenceDays) %
+        Math.abs(
+          differenceDays
+        ) %
         2 ===
         0
       );
@@ -665,8 +742,7 @@
             function (event) {
               document.getElementById(
                 "displayName"
-              ).innerText =
-                event.target.value;
+              ).innerText = event.target.value;
             }
           );
       }
@@ -674,14 +750,10 @@
 
     function initCalendar() {
       const grid =
-        document.getElementById(
-          "calendarGrid"
-        );
+        document.getElementById("calendarGrid");
 
       const title =
-        document.getElementById(
-          "calendarTitle"
-        );
+        document.getElementById("calendarTitle");
 
       title.innerText =
         currentYear +
@@ -721,8 +793,7 @@
         const emptyDiv =
           document.createElement("div");
 
-        emptyDiv.className =
-          "day empty";
+        emptyDiv.className = "day empty";
 
         grid.appendChild(emptyDiv);
       }
@@ -736,7 +807,16 @@
           document.createElement("div");
 
         dayDiv.className = "day";
-        dayDiv.innerText = day;
+
+        const dayNumber =
+          document.createElement("div");
+
+        dayNumber.className =
+          "day-number";
+
+        dayNumber.innerText = day;
+
+        dayDiv.appendChild(dayNumber);
 
         const dateStr =
           currentYear +
@@ -753,8 +833,7 @@
           );
 
         /*
-          休假日只顯示，
-          不設定點擊事件。
+          休假日只顯示，不加入點擊功能。
         */
         if (!dutyDay) {
           dayDiv.classList.add(
@@ -765,50 +844,81 @@
             "休假日，不開放用餐登記";
 
           grid.appendChild(dayDiv);
-
           continue;
         }
 
+        const mealButtons =
+          document.createElement("div");
+
+        mealButtons.className =
+          "meal-buttons";
+
+        const lunchButton =
+          document.createElement("button");
+
+        lunchButton.type = "button";
+        lunchButton.className =
+          "meal-btn";
+        lunchButton.innerText = "午";
+        lunchButton.title = "選擇午餐";
+
+        const dinnerButton =
+          document.createElement("button");
+
+        dinnerButton.type = "button";
+        dinnerButton.className =
+          "meal-btn";
+        dinnerButton.innerText = "晚";
+        dinnerButton.title = "選擇晚餐";
+
         if (
-          selectedDates.includes(dateStr)
+          selectedMeals[dateStr] &&
+          selectedMeals[dateStr].lunch
         ) {
-          dayDiv.classList.add(
+          lunchButton.classList.add(
             "selected"
           );
         }
 
-        dayDiv.addEventListener(
+        if (
+          selectedMeals[dateStr] &&
+          selectedMeals[dateStr].dinner
+        ) {
+          dinnerButton.classList.add(
+            "selected"
+          );
+        }
+
+        lunchButton.addEventListener(
           "click",
           function () {
-            if (
-              selectedDates.includes(
-                dateStr
-              )
-            ) {
-              selectedDates =
-                selectedDates.filter(
-                  function (date) {
-                    return (
-                      date !== dateStr
-                    );
-                  }
-                );
-
-              dayDiv.classList.remove(
-                "selected"
-              );
-            } else {
-              selectedDates.push(
-                dateStr
-              );
-
-              dayDiv.classList.add(
-                "selected"
-              );
-            }
-
-            updateDetails();
+            toggleMeal(
+              dateStr,
+              "lunch"
+            );
           }
+        );
+
+        dinnerButton.addEventListener(
+          "click",
+          function () {
+            toggleMeal(
+              dateStr,
+              "dinner"
+            );
+          }
+        );
+
+        mealButtons.appendChild(
+          lunchButton
+        );
+
+        mealButtons.appendChild(
+          dinnerButton
+        );
+
+        dayDiv.appendChild(
+          mealButtons
         );
 
         grid.appendChild(dayDiv);
@@ -816,8 +926,14 @@
     }
 
     function changeMonth(direction) {
+      /*
+        更換月份時清除上一個月份的選擇，
+        避免資料寫入錯誤的工作表。
+      */
       if (
-        selectedDates.length > 0
+        Object.keys(
+          selectedMeals
+        ).length > 0
       ) {
         const confirmChange =
           confirm(
@@ -829,7 +945,8 @@
         }
       }
 
-      selectedDates = [];
+      selectedMeals = {};
+
       currentMonth += direction;
 
       if (currentMonth > 12) {
@@ -864,7 +981,10 @@
 
       listContainer.innerHTML = "";
 
-      selectedDates.sort(
+      const selectedDateKeys =
+        Object.keys(
+          selectedMeals
+        ).sort(
         function (a, b) {
           return (
             parseDate(a) -
@@ -874,7 +994,7 @@
       );
 
       if (
-        selectedDates.length === 0
+        selectedDateKeys.length === 0
       ) {
         const emptyMessage =
           document.createElement("div");
@@ -883,17 +1003,16 @@
           "empty-message";
 
         emptyMessage.innerText =
-          "尚未選擇用餐日期";
+          "尚未選擇午餐或晚餐";
 
         listContainer.appendChild(
           emptyMessage
         );
       }
 
-      selectedDates.forEach(
+      selectedDateKeys.forEach(
         function (dateStr) {
-          const date =
-            parseDate(dateStr);
+          const date = parseDate(dateStr);
 
           const month =
             date.getMonth() + 1;
@@ -915,8 +1034,21 @@
           const item =
             document.createElement("div");
 
-          item.className =
-            "date-item";
+          item.className = "date-item";
+
+          const meals = [];
+
+          if (
+            selectedMeals[dateStr].lunch
+          ) {
+            meals.push("午");
+          }
+
+          if (
+            selectedMeals[dateStr].dinner
+          ) {
+            meals.push("晚");
+          }
 
           item.innerText =
             "📅 " +
@@ -925,21 +1057,23 @@
             day +
             "（" +
             weekday +
-            "）";
+            "）：" +
+            meals.join("、");
 
-          listContainer.appendChild(
-            item
-          );
+          listContainer.appendChild(item);
         }
       );
 
+      const totalMeals =
+        getTotalMeals();
+
       const totalCost =
-        selectedDates.length *
+        totalMeals *
         pricePerMeal;
 
       calculationText.innerText =
-        selectedDates.length +
-        " 天 × NT$ " +
+        totalMeals +
+        " 餐 × NT$ " +
         pricePerMeal;
 
       amountSpan.innerText =
@@ -947,8 +1081,7 @@
     }
 
     function parseDate(dateStr) {
-      const parts =
-        dateStr.split("/");
+      const parts = dateStr.split("/");
 
       return new Date(
         Number(parts[0]),
@@ -961,7 +1094,17 @@
     }
 
     function makeDateDetails() {
-      return selectedDates
+      return Object.keys(
+        selectedMeals
+      )
+        .sort(
+          function (a, b) {
+            return (
+              parseDate(a) -
+              parseDate(b)
+            );
+          }
+        )
         .map(
           function (dateStr) {
             const date =
@@ -984,13 +1127,28 @@
                 "六"
               ][date.getDay()];
 
+            const meals = [];
+
+            if (
+              selectedMeals[dateStr].lunch
+            ) {
+              meals.push("午");
+            }
+
+            if (
+              selectedMeals[dateStr].dinner
+            ) {
+              meals.push("晚");
+            }
+
             return (
               month +
               "/" +
               day +
               "（" +
               weekday +
-              "）"
+              "）：" +
+              meals.join("、")
             );
           }
         )
@@ -998,11 +1156,14 @@
     }
 
     function openModal() {
+      const totalMeals =
+        getTotalMeals();
+
       if (
-        selectedDates.length === 0
+        totalMeals === 0
       ) {
         alert(
-          "請至少選擇一天用餐日期！"
+          "請至少選擇一份午餐或晚餐！"
         );
 
         return;
@@ -1014,7 +1175,7 @@
         ).value;
 
       const totalAmount =
-        selectedDates.length *
+        totalMeals *
         pricePerMeal;
 
       const dateDetailsString =
@@ -1027,7 +1188,7 @@
       document.getElementById(
         "modalDays"
       ).innerText =
-        selectedDates.length;
+        totalMeals;
 
       document.getElementById(
         "modalDates"
@@ -1056,16 +1217,24 @@
           "nameSelect"
         ).value;
 
-      const totalDays =
-        selectedDates.length;
+      /*
+        Apps Script 目前仍使用 totalDays 這個欄位名稱，
+        但傳送的內容已改為「總餐數」。
+      */
+      const totalMeals =
+        getTotalMeals();
 
       const totalAmount =
-        totalDays *
+        totalMeals *
         pricePerMeal;
 
       const dateDetailsString =
         makeDateDetails();
 
+      /*
+        工作表名稱格式：
+        2026/08、2026/09、2026/10
+      */
       const sheetName =
         currentYear +
         "/" +
@@ -1088,7 +1257,7 @@
 
       formData.append(
         "totalDays",
-        totalDays
+        totalMeals
       );
 
       formData.append(
@@ -1107,10 +1276,13 @@
         );
 
       submitButton.disabled = true;
-
       submitButton.innerText =
         "送出中…";
 
+      /*
+        使用 no-cors 避免 GitHub Pages
+        被 Apps Script 跨網域限制阻擋。
+      */
       fetch(
         scriptURL,
         {
@@ -1133,7 +1305,7 @@
             totalAmount
           );
 
-          selectedDates = [];
+          selectedMeals = {};
 
           initCalendar();
           updateDetails();
@@ -1155,13 +1327,15 @@
       .finally(
         function () {
           submitButton.disabled = false;
-
           submitButton.innerText =
             "確認送出";
         }
       );
     }
 
+    /*
+      點擊黑色背景時關閉確認視窗。
+    */
     document
       .getElementById(
         "confirmModal"
